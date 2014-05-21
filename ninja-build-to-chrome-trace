@@ -1,39 +1,67 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
+"""Converts one (or several) .ninja_log files into chrome's about:tracing format
+
+Usage:
+    rm -rf $BUILDDIR && ninja -C $BUILDDIR
+    ninja-build-to-chrome-trace $BUILDDIR/.ninja_log > trace.json
+
+(If you don't have time for a clean build, at least run
+`ninja -C $BUILDDIR -t recompact` first.)"""
+
+import json
 import sys
 
+
 class Target:
-  def __init__(self, args):
-    self.start, self.end, self.stat_mtime, self.name, self.command_hash = args
-    self.start = int(self.start)
-    self.end = int(self.end)
-    self.stat_mtime = int(self.stat_mtime)
+    """Represents a single line read for a .ninja_log file."""
+    def __init__(self, args):
+        self.start, self.end, _, self.name, _ = args  # Ignore restat and hash.
+        self.start = int(self.start)
+        self.end = int(self.end)
+
 
 class Threads:
-  def __init__(self):
-    self.workers = []
+    """Tries to reconstruct the parallelism from a .ninja_log"""
+    def __init__(self):
+        self.workers = []  # Maps thread id to time that thread is occupied for.
 
-  def alloc(self, target):
-    for worker in range(len(self.workers)):
-      if self.workers[worker] <= target.start:
-        self.workers[worker] = target.end
-        return worker
-    self.workers.append(target.end)
-    return len(self.workers) - 1
+    def alloc(self, target):
+        """Places target in an available thread, or adds a new thread."""
+        for worker in range(len(self.workers)):
+            if self.workers[worker] <= target.start:
+                self.workers[worker] = target.end
+                return worker
+        self.workers.append(target.end)
+        return len(self.workers) - 1
 
-print "["
-first = True
-for pid, input in enumerate(sys.argv[1:]):
-  f = file(input, 'r')
-  header = f.readline()
-  assert header == "# ninja log v5\n", "unrecognized ninja log version %r" % header
 
-  targets = [Target(line.strip().split('\t')) for line in f.readlines()]
-  targets.sort(key = lambda target: target.start)
-  threads = Threads()
+def read_targets(log_file):
+    """Reads all targets from .ninja_log file |log_file|, sorted by start
+    time."""
+    with open(log_file, 'r') as f:
+        header = f.readline()
+        assert header == "# ninja log v5\n", \
+               "unrecognized ninja log version %r" % header
+        targets = [Target(line.strip().split('\t')) for line in f]
+    return sorted(targets, key = lambda target: target.start)
 
-  for target in targets:
-    if not first: print ","
-    first = False
-    print '{ "name": "%0s", "cat": "target", "ph": "X", "ts": %1d, "dur": %2d, "pid": %3d, "tid": %4d, "args": {} }' % (target.name, target.start * 1000, (target.end - target.start) * 1000, pid, threads.alloc(target)),
-print "]"
+
+def main(argv):
+    entries = []
+    for pid, log_file in enumerate(argv):
+        threads = Threads()
+        for target in read_targets(log_file):
+            entries.append({
+                'name': '%0s' % target.name, 'cat': 'target',
+                'ph': 'X', 'ts': str(target.start * 1000),
+                'dur': str((target.end - target.start) * 1000),
+                'pid': str(pid), 'tid': str(threads.alloc(target)), 'args': {},
+                })
+    json.dump(entries, sys.stdout)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        sys.exit(main(sys.argv[1:]))
+    print __doc__
