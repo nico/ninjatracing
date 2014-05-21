@@ -1,0 +1,39 @@
+#! /usr/bin/env python
+
+import sys
+
+class Target:
+  def __init__(self, args):
+    self.start, self.end, self.stat_mtime, self.name, self.command_hash = args
+    self.start = int(self.start)
+    self.end = int(self.end)
+    self.stat_mtime = int(self.stat_mtime)
+
+class Threads:
+  def __init__(self):
+    self.workers = []
+
+  def alloc(self, target):
+    for worker in range(len(self.workers)):
+      if self.workers[worker] <= target.start:
+        self.workers[worker] = target.end
+        return worker
+    self.workers.append(target.end)
+    return len(self.workers) - 1
+
+print "["
+first = True
+for pid, input in enumerate(sys.argv[1:]):
+  f = file(input, 'r')
+  header = f.readline()
+  assert header == "# ninja log v5\n", "unrecognized ninja log version %r" % header
+
+  targets = [Target(line.strip().split('\t')) for line in f.readlines()]
+  targets.sort(key = lambda target: target.start)
+  threads = Threads()
+
+  for target in targets:
+    if not first: print ","
+    first = False
+    print '{ "name": "%0s", "cat": "target", "ph": "X", "ts": %1d, "dur": %2d, "pid": %3d, "tid": %4d, "args": {} }' % (target.name, target.start * 1000, (target.end - target.start) * 1000, pid, threads.alloc(target)),
+print "]"
