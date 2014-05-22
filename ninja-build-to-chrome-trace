@@ -10,8 +10,27 @@ Usage:
 `ninja -C $BUILDDIR -t recompact` first.)"""
 
 import json
+import os
 import sys
+import tempfile
 
+def _InitPath():
+  trace_viewer_path = os.path.join(
+    os.path.dirname(__file__),
+    'third_party', 'trace-viewer')
+  if trace_viewer_path not in sys.path:
+    sys.path.append(trace_viewer_path)
+  try:
+    from trace_viewer.build import trace2html
+  except ImportError:
+    sys.stderr.write("""trace-viewer submodule not found.
+
+Did you forget to run this?
+  git submodule update --init --recursive
+""")
+
+_InitPath()
+from trace_viewer.build import trace2html
 
 class Target:
     """Represents a single line read for a .ninja_log file."""
@@ -58,8 +77,10 @@ def main(argv):
                 'dur': str((target.end - target.start) * 1000),
                 'pid': str(pid), 'tid': str(threads.alloc(target)), 'args': {},
                 })
-    json.dump(entries, sys.stdout)
-
+    with tempfile.NamedTemporaryFile() as f:
+      json.dump(entries, f)
+      f.flush()
+      trace2html.WriteHTMLForTracesToFile([f.name], sys.stdout)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
