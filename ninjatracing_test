@@ -15,15 +15,28 @@ class TestNinjaTracing(unittest.TestCase):
                        "100\t200\t0\tmy_output\tdeadbeef\n"
                        "50\t120\t0\tmy_first_output\t0afef\n")
         dicts = list(ninjatracing.log_to_dicts(log, 42))
-        expected = [
-            {
+        expected = [{
                 'name': 'my_first_output', 'cat': 'targets', 'ph': 'X',
                 'ts': '50000', 'dur': '70000', 'pid': '42', 'tid': '0',
                 'args': {}
-                },
-            {
+                }, {
                 'name': 'my_output', 'cat': 'targets', 'ph': 'X',
                 'ts': '100000', 'dur': '100000', 'pid': '42', 'tid': '1',
+                'args': {}
+                },
+            ]
+        self.assertEqual(expected, dicts)
+
+    def test_multiple_outputs(self):
+        # Both lines here have the same command hash and the same start
+        # and end times, meaning they were produced by the same command.
+        log = StringIO("# ninja log v5\n"
+                       "100\t200\t0\toutput\tdeadbeef\n"
+                       "100\t200\t0\tother_output\tdeadbeef\n")
+        dicts = list(ninjatracing.log_to_dicts(log, 42))
+        expected = [{
+                'name': 'output, other_output', 'cat': 'targets', 'ph': 'X',
+                'ts': '100000', 'dur': '100000', 'pid': '42', 'tid': '0',
                 'args': {}
                 },
             ]

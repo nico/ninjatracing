@@ -61,7 +61,7 @@ def construct_jobs(targets):
         if not target.hash in jobs:
             jobs[target.hash] = Job(target.start, target.end)
         jobs[target.hash].targets.append(target.name)
-    return sorted(jobs.values(), key = lambda job: job.start)
+    return sorted(jobs.values(), key=lambda job: job.start)
 
 
 def log_to_dicts(log, pid):
