@@ -21,6 +21,19 @@ class Target:
         self.targets = []
 
 
+def read_targets(log):
+    """Reads all targets from .ninja_log file |log_file|, sorted by start
+    time"""
+    header = log.readline()
+    assert header == "# ninja log v5\n", \
+           "unrecognized ninja log version %r" % header
+    targets = {}
+    for line in log:
+        start, end, _, name, cmdhash = line.strip().split('\t') # Ignore restat.
+        targets.setdefault(cmdhash, Target(start, end)).targets.append(name)
+    return sorted(targets.values(), key=lambda job: job.start)
+
+
 class Threads:
     """Tries to reconstruct the parallelism from a .ninja_log"""
     def __init__(self):
@@ -34,19 +47,6 @@ class Threads:
                 return worker
         self.workers.append(target.end)
         return len(self.workers) - 1
-
-
-def read_targets(log):
-    """Reads all targets from .ninja_log file |log_file|, sorted by start
-    time"""
-    header = log.readline()
-    assert header == "# ninja log v5\n", \
-           "unrecognized ninja log version %r" % header
-    targets = {}
-    for line in log:
-        start, end, _, name, cmdhash = line.strip().split('\t') # Ignore restat.
-        targets.setdefault(cmdhash, Target(start, end)).targets.append(name)
-    return sorted(targets.values(), key=lambda job: job.start)
 
 
 def log_to_dicts(log, pid):
