@@ -44,13 +44,12 @@ class Threads:
         return len(self.workers) - 1
 
 
-def read_targets(log_file):
+def read_targets(log):
     """Reads all targets from .ninja_log file |log_file|."""
-    with open(log_file, 'r') as f:
-        header = f.readline()
-        assert header == "# ninja log v5\n", \
-               "unrecognized ninja log version %r" % header
-        targets = [Target(line.strip().split('\t')) for line in f]
+    header = log.readline()
+    assert header == "# ninja log v5\n", \
+           "unrecognized ninja log version %r" % header
+    targets = [Target(line.strip().split('\t')) for line in log]
     return targets
 
 
@@ -65,17 +64,24 @@ def construct_jobs(targets):
     return sorted(jobs.values(), key = lambda job: job.start)
 
 
+def log_to_dicts(log, pid):
+    """Reads a file-like object |log| containing a .ninja_log, and yields one
+    about:tracing dict per command found in the log."""
+    threads = Threads()
+    for job in construct_jobs(read_targets(log)):
+        yield {
+            'name': '%0s' % ', '.join(job.targets), 'cat': 'targets',
+            'ph': 'X', 'ts': str(job.start * 1000),
+            'dur': str((job.end - job.start) * 1000),
+            'pid': str(pid), 'tid': str(threads.alloc(job)), 'args': {},
+            }
+
+
 def main(argv):
     entries = []
     for pid, log_file in enumerate(argv):
-        threads = Threads()
-        for job in construct_jobs(read_targets(log_file)):
-            entries.append({
-                'name': '%0s' % ', '.join(job.targets), 'cat': 'targets',
-                'ph': 'X', 'ts': str(job.start * 1000),
-                'dur': str((job.end - job.start) * 1000),
-                'pid': str(pid), 'tid': str(threads.alloc(job)), 'args': {},
-                })
+        with open(log_file, 'r') as log:
+            entries += list(log_to_dicts(log, pid))
     json.dump(entries, sys.stdout)
 
 
