@@ -17,5 +17,6 @@ Idea from Nick Carter, initial implementation from Richard Smith.
     built in the last build or previously, use --showall. Note that this will
     overlap multiple builds and will thus exaggerate build parallelism.
 
-    (When using --showall if you don't have time for a clean build, at least run
+    (When using --showall, ideally rm $BUILDDIR/.ninja_log and do a clean build.
+    If you don't have time for a clean build, at least run
     `ninja -C $BUILDDIR -t recompact` first to remove no-longer-built targets.)
