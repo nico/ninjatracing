@@ -20,3 +20,7 @@ Idea from Nick Carter, initial implementation from Richard Smith.
     (When using --showall, ideally rm $BUILDDIR/.ninja_log and do a clean build.
     If you don't have time for a clean build, at least run
     `ninja -C $BUILDDIR -t recompact` first to remove no-longer-built targets.)
+
+    The results can be converted from .json format to .html format, for easier
+    loading into about:tracing, using trace2html from:
+    https://github.com/catapult-project/catapult/blob/master/tracing/bin/trace2html
