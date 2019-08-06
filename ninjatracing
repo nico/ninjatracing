@@ -20,6 +20,7 @@ Usage:
     ninjatracing $BUILDDIR/.ninja_log > trace.json
 """
 
+from __future__ import print_function
 import json
 import optparse
 import sys
@@ -93,7 +94,7 @@ def main(argv):
     (options, args) = parser.parse_args()
 
     if len(args) == 0:
-      print 'Must specify at least one .ninja_log file'
+      print('Must specify at least one .ninja_log file')
       parser.print_help()
       return 1
 
