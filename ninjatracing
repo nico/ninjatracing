@@ -51,7 +51,7 @@ def read_targets(log, show_all):
         last_end_seen = int(end)
         start, end = -int(end), -int(start)
         targets.setdefault(cmdhash, Target(start, end)).targets.append(name)
-    return sorted(targets.values(), key=lambda job: -job.start)
+    return sorted(targets.values(), key=lambda job: job.start, reverse=True)
 
 
 class Threads:
