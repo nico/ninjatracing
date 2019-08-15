@@ -29,12 +29,12 @@ class TestNinjaTracing(unittest.TestCase):
                        "50\t120\t0\tmy_first_output\t0afef\n")
         dicts = list(ninjatracing.log_to_dicts(log, 42, True))
         expected = [{
-                'name': 'my_first_output', 'cat': 'targets', 'ph': 'X',
-                'ts': '50000', 'dur': '70000', 'pid': '42', 'tid': '0',
+                'name': 'my_output', 'cat': 'targets', 'ph': 'X',
+                'ts': '100000', 'dur': '100000', 'pid': '42', 'tid': '0',
                 'args': {}
                 }, {
-                'name': 'my_output', 'cat': 'targets', 'ph': 'X',
-                'ts': '100000', 'dur': '100000', 'pid': '42', 'tid': '1',
+                'name': 'my_first_output', 'cat': 'targets', 'ph': 'X',
+                'ts': '50000', 'dur': '70000', 'pid': '42', 'tid': '1',
                 'args': {}
                 },
             ]
