@@ -30,11 +30,11 @@ class TestNinjaTracing(unittest.TestCase):
         dicts = list(ninjatracing.log_to_dicts(log, 42, True))
         expected = [{
                 'name': 'my_output', 'cat': 'targets', 'ph': 'X',
-                'ts': '100000', 'dur': '100000', 'pid': '42', 'tid': '0',
+                'ts': 100000, 'dur': 100000, 'pid': 42, 'tid': 0,
                 'args': {}
                 }, {
                 'name': 'my_first_output', 'cat': 'targets', 'ph': 'X',
-                'ts': '50000', 'dur': '70000', 'pid': '42', 'tid': '1',
+                'ts': 50000, 'dur': 70000, 'pid': 42, 'tid': 1,
                 'args': {}
                 },
             ]
@@ -48,7 +48,7 @@ class TestNinjaTracing(unittest.TestCase):
         dicts = list(ninjatracing.log_to_dicts(log, 42, False))
         expected = [{
                 'name': 'my_first_output', 'cat': 'targets', 'ph': 'X',
-                'ts': '50000', 'dur': '70000', 'pid': '42', 'tid': '0',
+                'ts': 50000, 'dur': 70000, 'pid': 42, 'tid': 0,
                 'args': {}
                 },
             ]
@@ -63,7 +63,7 @@ class TestNinjaTracing(unittest.TestCase):
         dicts = list(ninjatracing.log_to_dicts(log, 42, True))
         expected = [{
                 'name': 'output, other_output', 'cat': 'targets', 'ph': 'X',
-                'ts': '100000', 'dur': '100000', 'pid': '42', 'tid': '0',
+                'ts': 100000, 'dur': 100000, 'pid': 42, 'tid': 0,
                 'args': {}
                 },
             ]

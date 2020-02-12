@@ -83,9 +83,9 @@ def log_to_dicts(log, pid, show_all):
     for target in read_targets(log, show_all):
         yield {
             'name': '%0s' % ', '.join(target.targets), 'cat': 'targets',
-            'ph': 'X', 'ts': str(target.start * 1000),
-            'dur': str((target.end - target.start) * 1000),
-            'pid': str(pid), 'tid': str(threads.alloc(target)), 'args': {},
+            'ph': 'X', 'ts': (target.start * 1000),
+            'dur': ((target.end - target.start) * 1000),
+            'pid': pid, 'tid': threads.alloc(target), 'args': {},
             }
 
 
