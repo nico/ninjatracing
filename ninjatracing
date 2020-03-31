@@ -142,12 +142,13 @@ def log_to_dicts(log, pid, options):
             'dur': ((target.end - target.start) * 1000),
             'pid': pid, 'tid': tid, 'args': {},
             }
-        # Add time-trace information into the ninja trace.
-        try:
-            ninja_log_dir = os.path.dirname(log.name)
-        except AttributeError:
-            continue
-        yield from embed_time_trace(ninja_log_dir, target, pid, tid, options)
+        if options.get('embed_time_trace', False):
+            # Add time-trace information into the ninja trace.
+            try:
+                ninja_log_dir = os.path.dirname(log.name)
+            except AttributeError:
+                continue
+            yield from embed_time_trace(ninja_log_dir, target, pid, tid, options)
 
 
 def main(argv):
@@ -162,6 +163,10 @@ def main(argv):
                       dest='granularity',
                       help='minimum length time-trace event to embed in '
                       'microseconds. Default: %default')
+    parser.add_option('-e', '--embed-time-trace', action='store_true',
+                      default=False, dest='embed_time_trace',
+                      help='embed clang -ftime-trace json file found adjacent '
+                      'to a target file')
     (options, args) = parser.parse_args()
 
     if len(args) == 0:
