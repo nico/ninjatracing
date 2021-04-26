@@ -182,7 +182,7 @@ def main(argv):
     for pid, log_file in enumerate(args):
         with open(log_file, 'r') as log:
             entries += list(log_to_dicts(log, pid, vars(options)))
-    json.dump(entries, sys.stdout)
+    json.dump(entries, sys.stdout, ensure_ascii=False)
 
 
 if __name__ == '__main__':
