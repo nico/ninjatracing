@@ -3,6 +3,9 @@ ninjatracing
 
 Convert .ninja_log files to chrome's about:tracing format.
 
+To view traces, either open about:tracing in chrome, or use
+https://www.speedscope.app/ or https://ui.perfetto.dev/.
+
 Idea from Nick Carter, initial implementation from Richard Smith.
 
     $ ./ninjatracing
