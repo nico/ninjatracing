@@ -98,9 +98,9 @@ def read_events(trace, options):
 def trace_to_dicts(target, trace, options, pid, tid):
     """Read a file-like object |trace| containing -ftime-trace data and yields
     about:tracing dict per eligible event in that log."""
+    ninja_time = (target.end - target.start) * 1000
     for event in read_events(trace, options):
         # Check if any event duration is greater than the duration from ninja.
-        ninja_time = (target.end - target.start) * 1000
         if event['dur'] > ninja_time:
             print("Inconsistent timing found (clang time > ninja time). Please"
                   " ensure that timings are from consistent builds.")
