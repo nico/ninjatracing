@@ -86,5 +86,25 @@ class TestNinjaTracing(unittest.TestCase):
             ]
         self.assertEqual(expected, dicts)
 
+    def test_comments(self):
+        log = StringIO("# ninja log v5\n"
+                       "#\n"
+                       "100\t200\t0\tmy_output\tdeadbeef\n"
+                       "# 100\t666\t0\tignored_output\tdeadbeef\n"
+                       "50\t120\t0\tmy_first_output\t0afef\n"
+                       "# lastline")
+        dicts = list(ninjatracing.log_to_dicts(log, 42, {'showall': True}))
+        expected = [{
+                'name': 'my_output', 'cat': 'targets', 'ph': 'X',
+                'ts': 100000, 'dur': 100000, 'pid': 42, 'tid': 0,
+                'args': {}
+                }, {
+                'name': 'my_first_output', 'cat': 'targets', 'ph': 'X',
+                'ts': 50000, 'dur': 70000, 'pid': 42, 'tid': 1,
+                'args': {}
+                },
+            ]
+        self.assertEqual(expected, dicts)
+
 if __name__ == '__main__':
     unittest.main()
