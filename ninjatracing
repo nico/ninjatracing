@@ -55,6 +55,8 @@ def read_targets(log, show_all):
     targets = {}
     last_end_seen = 0
     for line in log:
+        if line.startswith('#'):
+            continue
         start, end, _, name, cmdhash = line.strip().split('\t') # Ignore restat.
         if not show_all and int(end) < last_end_seen:
             # An earlier time stamp means that this step is the first in a new
