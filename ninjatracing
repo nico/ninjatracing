@@ -23,7 +23,6 @@ Usage:
     ninjatracing $BUILDDIR/.ninja_log > trace.json
 """
 
-from __future__ import print_function
 import json
 import os
 import optparse
