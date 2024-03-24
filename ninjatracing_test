@@ -86,6 +86,10 @@ class TestNinjaTracing(unittest.TestCase):
             ]
         self.assertEqual(expected, dicts)
 
+        invalid_trace = StringIO('{ "someRandomField": {} }')
+        events = ninjatracing.read_events(invalid_trace, {})
+        self.assertEqual(0, len(events))
+
     def test_comments(self):
         log = StringIO("# ninja log v5\n"
                        "#\n"
