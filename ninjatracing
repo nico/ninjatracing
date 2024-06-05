@@ -50,17 +50,28 @@ def read_targets(log, show_all):
 
     targets = {}
     last_end_seen = 0
+    # Start of the current (incremental) build.
+    build_start = 0
     for line in log:
         if line.startswith('#'):
             continue
         start, end, _, name, cmdhash = line.strip().split('\t') # Ignore restat.
-        if not show_all and int(end) < last_end_seen:
+        start = int(start)
+        end = int(end)
+        if end < last_end_seen:
             # An earlier time stamp means that this step is the first in a new
-            # build, possibly an incremental build. Throw away the previous data
-            # so that this new build will be displayed independently.
-            targets = {}
-        last_end_seen = int(end)
-        targets.setdefault(cmdhash, Target(start, end)).targets.append(name)
+            # build, possibly an incremental build.
+            if not show_all:
+                # Throw away the previous data so that only the last build will
+                # be displayed.
+                targets = {}
+            else:
+                # Assume that the next build starts directly after the previous one.
+                build_start += last_end_seen
+        last_end_seen = end
+        targets \
+            .setdefault(cmdhash, Target(build_start + start, build_start + end)) \
+            .targets.append(name)
     return sorted(targets.values(), key=lambda job: job.end, reverse=True)
 
 
