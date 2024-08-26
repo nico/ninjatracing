@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ninjatracing"
+version = "0.1.0"
+requires-python = ">=3.7"
+authors = [
+  {name = "Nico Weber", email = "thakis@chromium.org"},
+]
+maintainers = [
+  {name = "Nico Weber", email = "thakis@chromium.org"},
+]
+description = "Convert .ninja_log files to chrome's about:tracing format."
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["ninja", "C++", "clang"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Repository = "https://github.com/nico/ninjatracing"
+"Bug Tracker" = "https://github.com/nico/ninjatracing/issues"
+
+[project.scripts]
+ninjatracing = "ninjatracing:main"
