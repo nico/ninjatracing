@@ -172,7 +172,7 @@ def log_to_dicts(log, pid, options):
                 yield time_trace
 
 
-def main(argv):
+def main():
     usage = __doc__
     parser = optparse.OptionParser(usage)
     parser.add_option('-a', '--showall', action='store_true', dest='showall',
@@ -203,4 +203,4 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main())

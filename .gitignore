@@ -1,1 +1,5 @@
 *.pyc
+
+# Common IDE folders
+.idea/
+.vscode/
