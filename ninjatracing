@@ -119,6 +119,14 @@ def embed_time_trace(ninja_log_dir, target, pid, tid, options):
     time-trace file to be in .json file named based on .o file."""
     for t in target.targets:
         o_path = os.path.join(ninja_log_dir, t)
+
+        # We need to ignore auxillary json files in the .ninja_log. These can be
+        # files like CXXModules.json which do not have any corresponding clang json
+        # time trace.
+        (_,ext) = os.path.splitext(o_path)
+        if ext == ".json":
+            continue
+
         json_trace_path = os.path.splitext(o_path)[0] + '.json'
         try:
             with open(json_trace_path, 'r') as trace:
