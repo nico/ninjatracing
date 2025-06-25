@@ -46,7 +46,7 @@ def read_targets(log, show_all):
     m = re.search(r'^# ninja log v(\d+)\n$', header)
     assert m, "unrecognized ninja log version %r" % header
     version = int(m.group(1))
-    assert 5 <= version <= 6, "unsupported ninja log version %d" % version
+    assert 5 <= version <= 7, "unsupported ninja log version %d" % version
 
     targets = {}
     last_end_seen = 0
