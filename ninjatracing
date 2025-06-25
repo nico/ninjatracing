@@ -47,9 +47,6 @@ def read_targets(log, show_all):
     assert m, "unrecognized ninja log version %r" % header
     version = int(m.group(1))
     assert 5 <= version <= 6, "unsupported ninja log version %d" % version
-    if version == 6:
-        # Skip header line
-        next(log)
 
     targets = {}
     last_end_seen = 0
