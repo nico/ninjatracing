@@ -94,6 +94,10 @@ def read_events(trace, options):
     """Reads all events from time-trace json file |trace|."""
     trace_data = json.load(trace)
 
+    # Ignore unrelated JSON files.
+    if 'traceEvents' not in trace_data:
+        return []
+
     def include_event(event, options):
         """Only include events if they are complete events, are longer than
         granularity, and are not totals."""
